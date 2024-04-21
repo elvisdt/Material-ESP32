@@ -1,4 +1,9 @@
-﻿// Método GET -----------------------------------------------------------------
+﻿
+#include "freertos/FreeRTOS.h"
+#include "AP_Server.h"
+
+
+// Método GET -----------------------------------------------------------------
 static esp_err_t http_handle_get(httpd_req_t *req) {
    
 #ifdef DEBUG_AP_SERVER
@@ -71,7 +76,7 @@ static esp_err_t receive_ota_handle(httpd_req_t *req)
    const esp_partition_t *update_partition = esp_ota_get_next_update_partition(NULL);
 #ifdef DEBUG_OTA
    ESP_LOGW(LOG_OTA, "---->Partition label: '%s'\n", update_partition->label);
-   ESP_LOGW(LOG_OTA, "---->Partition size: '%d'\n", update_partition->size);
+   ESP_LOGW(LOG_OTA, "---->Partition size: '%lu'\n", update_partition->size);
 #endif
 
    status_update_ota = -1; // Código de erro 
@@ -122,7 +127,7 @@ static esp_err_t receive_ota_handle(httpd_req_t *req)
          else
          {
 #ifdef DEBUG_OTA
-            ESP_LOGI(LOG_OTA, "Writing to partition subtype %d at offset 0x%x", update_partition->subtype, update_partition->address);
+            ESP_LOGI(LOG_OTA, "Writing to partition subtype %d at offset 0x%lx", update_partition->subtype, update_partition->address);
 #endif
          }
 
@@ -147,7 +152,7 @@ static esp_err_t receive_ota_handle(httpd_req_t *req)
 
 #ifdef DEBUG_OTA
          const esp_partition_t *boot_partition = esp_ota_get_boot_partition();
-         ESP_LOGI(LOG_OTA, "Next boot partition subtype %d at offset 0x%x", boot_partition->subtype, boot_partition->address);
+         ESP_LOGI(LOG_OTA, "Next boot partition subtype %d at offset 0x%lx", boot_partition->subtype, boot_partition->address);
          ESP_LOGI(LOG_OTA, "Please Restart System...");
 #endif
          status_update_ota = 1;

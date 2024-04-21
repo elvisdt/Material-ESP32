@@ -1,9 +1,14 @@
-﻿#include <esp_wifi.h>
+﻿
+#ifndef _AP_SERVER_H_
+#define _AP_SERVER_H_
+
+#include <esp_wifi.h>
 #include <esp_event.h>
 #include <esp_system.h>
 #include <sys/param.h>
 #include <esp_http_server.h>
 #include <esp_ota_ops.h>
+#include "esp_err.h"
 
 #ifdef DEBUG_AP_SERVER
 const char *LOG_SERVER = "SERVER";
@@ -90,3 +95,5 @@ static static_content_t content_list[] = {
    {"/mini.css", mini_css_start, mini_css_end, "text/css", false, NULL},
    {"/styles.css", styles_css_start, styles_css_end, "text/css", false, NULL},
    {"/favicon.png", favicon_png_start, favicon_png_end, "image/x-icon", false, NULL}};
+
+#endif   /*_AP_SERVER_H_*/

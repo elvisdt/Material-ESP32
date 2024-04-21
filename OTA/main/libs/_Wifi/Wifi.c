@@ -1,4 +1,5 @@
 ﻿
+#include "esp_wifi.h"
 /******************************************************************************
  * Trata Os eventos do wifi.
  *****************************************************************************/
@@ -11,23 +12,28 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t e
       xEventGroupClearBits(app_event_group, RECEBEU_IP_DO_ROTEADOR);
       esp_wifi_connect();
    }
-   else if (event_base == WIFI_EVENT && event_id == SYSTEM_EVENT_AP_STACONNECTED) {
+   else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_CONNECTED ) {
 #ifdef DEBUG_WIFI
       ESP_LOGI(LOG_WIFI, "Disp. conectou no ESP");
-      wifi_event_ap_stadisconnected_t *event = (wifi_event_ap_stadisconnected_t *) event_data;
-      ESP_LOGI(LOG_WIFI, "station " MACSTR " join, AID=%d",
-               MAC2STR(event->mac), event->aid);
+      wifi_event_ap_staconnected_t *event = (wifi_event_ap_staconnected_t *) event_data;
+      uint8_t mac[6]={0};//event->mac;
+      memcpy(mac,event->mac,6);
+      ESP_LOGI(LOG_WIFI, "station %02x:%02x:%02x:%02x:%02x:%02x join, AID=%d", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], event->aid);
+
 #endif
    }
-   else if (event_base == WIFI_EVENT && event_id == SYSTEM_EVENT_AP_STADISCONNECTED) { // Dispositivo desconectou do ESP
+   else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_AP_STADISCONNECTED) { // Dispositivo desconectou do ESP
 #ifdef DEBUG_WIFI
       wifi_event_ap_stadisconnected_t *event = (wifi_event_ap_stadisconnected_t *) event_data;
       ESP_LOGI(LOG_WIFI, "Disp. desconectou do ESP");
-      ESP_LOGI(LOG_WIFI, MACSTR "leave, AID=%d",
-               MAC2STR(event->mac), event->aid);
+      uint8_t mac[6]={0};//event->mac;
+      memcpy(mac,event->mac,6);
+      ESP_LOGI(LOG_WIFI, "station %02x:%02x:%02x:%02x:%02x:%02x leave, AID=%d", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], event->aid);
+
 #endif
    }
-   else if (event_base == WIFI_EVENT && event_id == SYSTEM_EVENT_STA_CONNECTED) { // Conectou no roteador
+   // ... Resto de tu código ...
+   else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_CONNECTED) { // Conectou no roteador
 #ifdef DEBUG_WIFI
       ESP_LOGI(LOG_WIFI, "Conectou no Rot.");
 #endif
@@ -42,7 +48,7 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t e
 
       xEventGroupSetBits(app_event_group, RECEBEU_IP_DO_ROTEADOR);
    }
-   else if (event_base == WIFI_EVENT && event_id == SYSTEM_EVENT_STA_DISCONNECTED) { // Desconectou do Roteador
+   else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) { // Desconectou do Roteador
 #ifdef DEBUG_WIFI
       ESP_LOGI(LOG_WIFI, "Desconectou do Rot.");
 #endif
@@ -54,17 +60,17 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t e
 #endif
    }
 
-   else if (event_base == WIFI_EVENT && event_id == SYSTEM_EVENT_AP_STAIPASSIGNED) { // Dispositivo conectou no ESP e recebeu IP
+   else if (event_base == WIFI_EVENT && event_id == IP_EVENT_AP_STAIPASSIGNED) { // Dispositivo conectou no ESP e recebeu IP
 #ifdef DEBUG_WIFI
       ESP_LOGI(LOG_WIFI, "Disp. Conectou.");
 #endif
    }
-   else if (event_base == WIFI_EVENT && event_id == SYSTEM_EVENT_STA_START) {
+   else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
 #ifdef DEBUG_WIFI
       ESP_LOGI(LOG_WIFI, "Evento STA start.");
 #endif
    }
-   else if (event_base == WIFI_EVENT && event_id == SYSTEM_EVENT_SCAN_DONE) {
+   else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_SCAN_DONE) {
    }
    else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_LOST_IP) {
 #ifdef DEBUG_WIFI
@@ -74,7 +80,7 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t e
    }
    else {
 #ifdef DEBUG_WIFI
-      ESP_LOGE(LOG_WIFI, "Evento Inválido ->%d, %d", (int) event_base, event_id);
+      ESP_LOGE(LOG_WIFI, "Evento Inválido ->%d, %ld", (int) event_base, event_id);
 #endif
    }
 }
@@ -120,7 +126,7 @@ static void config_tcpip_ap_fix() {
 
    esp_netif_get_dns_info(app_ap_netif, ESP_NETIF_DNS_MAIN, &dns);
 #ifdef DEBUG_WIFI
-   ESP_LOGI(LOG_WIFI, "ESP_NETIF_DNS_MAIN->%d", dns.ip.u_addr.ip4.addr);
+   ESP_LOGI(LOG_WIFI, "ESP_NETIF_DNS_MAIN->%lu", dns.ip.u_addr.ip4.addr);
 #endif
 }
 

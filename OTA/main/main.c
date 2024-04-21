@@ -1,6 +1,8 @@
 ﻿// includes do sistema --------------------------------------------------------
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
+#include "freertos/task.h"
+
 #include "driver/gpio.h"
 #include "esp_event.h"
 #include <stdio.h>
@@ -10,17 +12,18 @@
 #include "esp_wifi.h"
 #include "nvs_flash.h"
 #include "esp_netif.h"
+#include "esp_rom_gpio.h"
 
 // Carrega os protótipos e variáveis globais ----------------------------------
 #include "main.h"
 
 void print_heap(int i) {
-   printf("Free heap [%d]: %d\r\n", i, esp_get_free_heap_size());
+   printf("Free heap [%d]: %lu\r\n", i, esp_get_free_heap_size());
 }
 
 #ifdef DEBUG_TASK_MONITOR
 static void print_task_monitor(void *pvParameters) {
-   char msg[500];
+   char msg[500]={0};
    while (1) {
       print_heap(0);
       vTaskList(msg);
@@ -45,7 +48,7 @@ void app_controller(void *pvParameters) {
 // Hardware -------------------------------------------------------------------
 void inicia_hardware() {
    // Configura o pino do LED como sída e desliga na inicialização.
-   gpio_pad_select_gpio(PIN_LED);
+   esp_rom_gpio_pad_select_gpio(PIN_LED);
    gpio_set_direction(PIN_LED, GPIO_MODE_OUTPUT);
    gpio_set_level(PIN_LED, 0);
 }
