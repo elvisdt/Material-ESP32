@@ -11,6 +11,7 @@
 // #include <math.h>
 #include "esp_wifi.h"
 #include "nvs_flash.h"
+#include "nvs.h"
 #include "esp_netif.h"
 #include "esp_rom_gpio.h"
 
@@ -60,6 +61,14 @@ void inicia_variaveis_aplicacao() {
 
 void app_main() {
    ESP_LOGI("APP_MAIN","Compiled at: "__TIME__ ", " __DATE__);
+
+   ESP_LOGI("APP_MAIN","Init NVS keys of data");
+	esp_err_t err = nvs_flash_init();
+	if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+		ESP_ERROR_CHECK(nvs_flash_erase());
+		err = nvs_flash_init();
+	}
+    ESP_ERROR_CHECK(err);
 
    inicia_hardware();
    inicia_variaveis_aplicacao();

@@ -1,12 +1,12 @@
 // Configurações da aplicação alteradas via OTA -------------------------------
 // Rede Wifi
-#define SSID_WIFI_AP "OTA-WEBSERVER"
+#define SSID_WIFI_AP "ESP-OTA"
 #define PASS_WIFI_AP "123456789"
 #define WIFI_AP_MAX_CON 1
 
 // Rede local
-#define SSID_WIFI_STA "Jesus_te_ama"
-#define PASS_WIFI_STA "quesenha"
+#define SSID_WIFI_STA "malek-20"
+#define PASS_WIFI_STA "E2020D05"
 
 // LED Status -----------------------------------------------------------------
 #define PIN_LED 2
